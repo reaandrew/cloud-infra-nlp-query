@@ -80,7 +80,7 @@ resource "aws_cloudwatch_event_rule" "ec2_events" {
   description = "Capture EC2 events"
 
   event_pattern = jsonencode({
-    source      = ["demo.ec2"],
+    source      = ["demo.aws.ec2"],
     detail-type = ["EC2 Instance State-change Notification"]
   })
 }
