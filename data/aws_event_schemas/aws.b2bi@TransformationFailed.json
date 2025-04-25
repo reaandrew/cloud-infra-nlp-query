@@ -1,0 +1,123 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "TransformationFailed"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail",
+          "detail-type",
+          "resources",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Transformation Failed",
+        "x-amazon-events-source": "aws.b2bi",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/TransformationFailed"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "region": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "account": {
+            "type": "string"
+          }
+        }
+      },
+      "TransformationFailed": {
+        "type": "object",
+        "required": [
+          "failure-code",
+          "failure-message",
+          "start-timestamp",
+          "end-timestamp",
+          "trading-partner-id"
+        ],
+        "properties": {
+          "failure-code": {
+            "type": "string"
+          },
+          "failure-message": {
+            "type": "string"
+          },
+          "start-timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end-timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "trading-partner-id": {
+            "type": "string"
+          },
+          "x12-transaction-set": {
+            "type": "string"
+          },
+          "x12-version": {
+            "type": "string"
+          },
+          "input-file-s3-attributes": {
+            "$ref": "#/components/schemas/Input-file-s3-attributes"
+          },
+          "ack-error-code-detected": {
+            "type": "boolean"
+          },
+          "ack-generation-status": {
+            "type": "string"
+          }
+        }
+      },
+      "Input-file-s3-attributes": {
+        "type": "object",
+        "required": [
+          "bucket",
+          "object-key"
+        ],
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "object-key": {
+            "type": "string"
+          },
+          "object-size-bytes": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

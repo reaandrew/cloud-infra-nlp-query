@@ -1,0 +1,104 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "SFTPConnectorDirectoryListingFailed"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "SFTP Connector Directory Listing Failed",
+        "x-amazon-events-source": "aws.transfer-test",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/SFTPConnectorDirectoryListingFailed"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "SFTPConnectorDirectoryListingFailed": {
+        "type": "object",
+        "required": [
+          "failure-code",
+          "status-code",
+          "listing-id",
+          "remote-directory-path",
+          "failure-message",
+          "connector-id",
+          "max-items",
+          "url",
+          "output-directory-path"
+        ],
+        "properties": {
+          "connector-id": {
+            "type": "string"
+          },
+          "failure-code": {
+            "type": "string"
+          },
+          "failure-message": {
+            "type": "string"
+          },
+          "listing-id": {
+            "type": "string"
+          },
+          "max-items": {
+            "type": "number"
+          },
+          "output-directory-path": {
+            "type": "string"
+          },
+          "remote-directory-path": {
+            "type": "string"
+          },
+          "status-code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,293 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "MWAAEnvironmentStatusChange"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "MWAA Environment Status Change",
+        "x-amazon-events-source": "aws.airflow",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/MWAAEnvironmentStatusChange"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "MWAAEnvironmentStatusChange": {
+        "type": "object",
+        "required": [
+          "airflowVersion",
+          "kmsKey",
+          "pluginsS3Path",
+          "dagS3Path",
+          "loggingConfiguration",
+          "requirementsS3Path",
+          "webserverVpcEndpointService",
+          "createdAt",
+          "maxWorkers",
+          "endpointManagement",
+          "schedulers",
+          "startupScriptS3ObjectVersion",
+          "pluginsS3ObjectVersion",
+          "arn",
+          "serviceRoleArn",
+          "databaseVpcEndpointService",
+          "requirementsS3ObjectVersion",
+          "startupScriptS3Path",
+          "networkConfiguration",
+          "webserverAccessMode",
+          "sourceBucketArn",
+          "weeklyMaintenanceWindowStart",
+          "executionRoleArn",
+          "lastUpdate",
+          "name",
+          "environmentClass",
+          "minWorkers",
+          "celeryExecutorQueue",
+          "webserverUrl",
+          "status"
+        ],
+        "properties": {
+          "lastUpdate": {
+            "$ref": "#/components/schemas/LastUpdate"
+          },
+          "loggingConfiguration": {
+            "$ref": "#/components/schemas/LoggingConfiguration"
+          },
+          "networkConfiguration": {
+            "$ref": "#/components/schemas/NetworkConfiguration"
+          },
+          "airflowVersion": {
+            "type": "string"
+          },
+          "arn": {
+            "type": "string"
+          },
+          "celeryExecutorQueue": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "dagS3Path": {
+            "type": "string"
+          },
+          "databaseVpcEndpointService": {
+            "type": "string"
+          },
+          "endpointManagement": {
+            "type": "string"
+          },
+          "environmentClass": {
+            "type": "string"
+          },
+          "executionRoleArn": {
+            "type": "string"
+          },
+          "kmsKey": {
+            "type": "string"
+          },
+          "maxWorkers": {
+            "type": "number"
+          },
+          "minWorkers": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pluginsS3ObjectVersion": {
+            "type": "string"
+          },
+          "pluginsS3Path": {
+            "type": "string"
+          },
+          "requirementsS3ObjectVersion": {
+            "type": "string"
+          },
+          "requirementsS3Path": {
+            "type": "string"
+          },
+          "schedulers": {
+            "type": "number"
+          },
+          "serviceRoleArn": {
+            "type": "string"
+          },
+          "sourceBucketArn": {
+            "type": "string"
+          },
+          "startupScriptS3ObjectVersion": {
+            "type": "string"
+          },
+          "startupScriptS3Path": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "webserverAccessMode": {
+            "type": "string"
+          },
+          "webserverUrl": {
+            "type": "string"
+          },
+          "webserverVpcEndpointService": {
+            "type": "string"
+          },
+          "weeklyMaintenanceWindowStart": {
+            "type": "string"
+          }
+        }
+      },
+      "LastUpdate": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "source",
+          "error",
+          "status"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/Error"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LoggingConfiguration": {
+        "type": "object",
+        "required": [
+          "schedulerLogs",
+          "dagProcessingLogs",
+          "webserverLogs",
+          "workerLogs",
+          "taskLogs"
+        ],
+        "properties": {
+          "dagProcessingLogs": {
+            "$ref": "#/components/schemas/DagProcessingLogs"
+          },
+          "schedulerLogs": {
+            "$ref": "#/components/schemas/DagProcessingLogs"
+          },
+          "taskLogs": {
+            "$ref": "#/components/schemas/DagProcessingLogs"
+          },
+          "webserverLogs": {
+            "$ref": "#/components/schemas/DagProcessingLogs"
+          },
+          "workerLogs": {
+            "$ref": "#/components/schemas/DagProcessingLogs"
+          }
+        }
+      },
+      "NetworkConfiguration": {
+        "type": "object",
+        "required": [
+          "securityGroupIds",
+          "subnetIds"
+        ],
+        "properties": {
+          "securityGroupIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subnetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "errorMessage",
+          "errorCode"
+        ],
+        "properties": {
+          "errorCode": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "DagProcessingLogs": {
+        "type": "object",
+        "required": [
+          "logLevel",
+          "cloudWatchLogGroupArn",
+          "enabled"
+        ],
+        "properties": {
+          "cloudWatchLogGroupArn": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "logLevel": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

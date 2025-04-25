@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "CallAnalyticsJobStateChange"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Call Analytics Job State Change",
+        "x-amazon-events-source": "aws.transcribe",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/CallAnalyticsJobStateChange"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "CallAnalyticsJobStateChange": {
+        "type": "object",
+        "required": [
+          "JobName",
+          "JobStatus"
+        ],
+        "properties": {
+          "JobName": {
+            "type": "string"
+          },
+          "JobStatus": {
+            "type": "string"
+          },
+          "AnalyticsJobDetails": {
+            "$ref": "#/components/schemas/AnalyticsJobDetails"
+          }
+        }
+      },
+      "AnalyticsJobDetails": {
+        "type": "object",
+        "required": [
+          "Skipped"
+        ],
+        "properties": {
+          "Skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CallAnalyticsSkippedFeature"
+            }
+          }
+        }
+      },
+      "CallAnalyticsSkippedFeature": {
+        "type": "object",
+        "required": [
+          "feature",
+          "reasonCode",
+          "message"
+        ],
+        "properties": {
+          "feature": {
+            "type": "string"
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

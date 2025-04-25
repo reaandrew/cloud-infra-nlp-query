@@ -1,0 +1,108 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "SFTPServerFileUploadCompleted"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "SFTP Server File Upload Completed",
+        "x-amazon-events-source": "aws.transfer",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/SFTPServerFileUploadCompleted"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "SFTPServerFileUploadCompleted": {
+        "type": "object",
+        "required": [
+          "status-code",
+          "protocol",
+          "bytes",
+          "client-ip",
+          "end-timestamp",
+          "file-path",
+          "server-id",
+          "session-id",
+          "start-timestamp",
+          "username"
+        ],
+        "properties": {
+          "bytes": {
+            "type": "number"
+          },
+          "client-ip": {
+            "type": "string"
+          },
+          "end-timestamp": {
+            "type": "string"
+          },
+          "file-path": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "server-id": {
+            "type": "string"
+          },
+          "session-id": {
+            "type": "string"
+          },
+          "start-timestamp": {
+            "type": "string"
+          },
+          "status-code": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "CacheUpdated"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Cache Updated",
+        "x-amazon-events-source": "aws.elasticache",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/CacheUpdated"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "CacheUpdated": {
+        "type": "object",
+        "required": [
+          "Message",
+          "SourceArn",
+          "SourceType",
+          "SourceIdentifier",
+          "EventCategories",
+          "EventID"
+        ],
+        "properties": {
+          "EventCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "EventID": {
+            "type": "string"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "SourceArn": {
+            "type": "string"
+          },
+          "SourceIdentifier": {
+            "type": "string"
+          },
+          "SourceType": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

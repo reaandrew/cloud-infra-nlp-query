@@ -1,0 +1,96 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "ECRPullThroughCacheAction"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "ECRPullThroughCacheAction",
+        "x-amazon-events-source": "aws.ecr",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/ECRPullThroughCacheAction"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "ECRPullThroughCacheAction": {
+        "type": "object",
+        "required": [
+          "sync-status",
+          "ecr-repository-prefix",
+          "repository-name",
+          "upstream-registry-url"
+        ],
+        "properties": {
+          "sync-status": {
+            "type": "string"
+          },
+          "ecr-repository-prefix": {
+            "type": "string"
+          },
+          "repository-name": {
+            "type": "string"
+          },
+          "upstream-registry-url": {
+            "type": "string"
+          },
+          "image-tag": {
+            "type": "string"
+          },
+          "image-digest": {
+            "type": "string"
+          },
+          "failure-code": {
+            "type": "string"
+          },
+          "failure-reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

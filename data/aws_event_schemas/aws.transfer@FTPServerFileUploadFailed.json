@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "FTPServerFileUploadFailed"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "FTP Server File Upload Failed",
+        "x-amazon-events-source": "aws.transfer",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/FTPServerFileUploadFailed"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "FTPServerFileUploadFailed": {
+        "type": "object",
+        "required": [
+          "client-ip",
+          "end-timestamp",
+          "start-timestamp",
+          "failure-code",
+          "status-code",
+          "protocol",
+          "bytes",
+          "etag",
+          "failure-message",
+          "file-path",
+          "server-id",
+          "session-id",
+          "username"
+        ],
+        "properties": {
+          "bytes": {
+            "type": "number"
+          },
+          "client-ip": {
+            "type": "string"
+          },
+          "end-timestamp": {
+            "type": "string"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "failure-code": {
+            "type": "string"
+          },
+          "failure-message": {
+            "type": "string"
+          },
+          "file-path": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "server-id": {
+            "type": "string"
+          },
+          "session-id": {
+            "type": "string"
+          },
+          "start-timestamp": {
+            "type": "string"
+          },
+          "status-code": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

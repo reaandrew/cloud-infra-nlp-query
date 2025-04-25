@@ -1,0 +1,96 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "ImportJobSubmitted"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Import Job Submitted",
+        "x-amazon-events-source": "aws.medical-imaging",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/ImportJobSubmitted"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "ImportJobSubmitted": {
+        "type": "object",
+        "required": [
+          "jobName",
+          "jobId",
+          "imagingVersion",
+          "inputS3Uri",
+          "jobStatus",
+          "datastoreId",
+          "outputS3Uri"
+        ],
+        "properties": {
+          "datastoreId": {
+            "type": "string"
+          },
+          "imagingVersion": {
+            "type": "string"
+          },
+          "inputS3Uri": {
+            "type": "string"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "jobName": {
+            "type": "string"
+          },
+          "jobStatus": {
+            "type": "string"
+          },
+          "outputS3Uri": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

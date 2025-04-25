@@ -1,0 +1,131 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "AcknowledgementFailed"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail",
+          "account",
+          "detail-type",
+          "id",
+          "region",
+          "resources",
+          "source",
+          "time",
+          "version"
+        ],
+        "x-amazon-events-detail-type": "Acknowledgement Failed",
+        "x-amazon-events-source": "aws.b2bi",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/AcknowledgementFailed"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "AcknowledgementFailed": {
+        "type": "object",
+        "required": [
+          "input-file-s3-attributes",
+          "ack-x12-type",
+          "ack-x12-version",
+          "input-x12-transaction-set",
+          "input-x12-version",
+          "start-timestamp",
+          "end-timestamp",
+          "failure-message",
+          "failure-code",
+          "trading-partner-id"
+        ],
+        "properties": {
+          "input-file-s3-attributes": {
+            "$ref": "#/components/schemas/Input-file-s3-attributes"
+          },
+          "ack-x12-type": {
+            "type": "string"
+          },
+          "ack-x12-version": {
+            "type": "string"
+          },
+          "input-x12-transaction-set": {
+            "type": "string"
+          },
+          "input-x12-version": {
+            "type": "string"
+          },
+          "start-timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end-timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "failure-message": {
+            "type": "string"
+          },
+          "failure-code": {
+            "type": "string"
+          },
+          "trading-partner-id": {
+            "type": "string"
+          },
+          "transformer-job-id": {
+            "type": "string"
+          }
+        }
+      },
+      "Input-file-s3-attributes": {
+        "type": "object",
+        "required": [
+          "bucket",
+          "object-key"
+        ],
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "object-key": {
+            "type": "string"
+          },
+          "object-size-bytes": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

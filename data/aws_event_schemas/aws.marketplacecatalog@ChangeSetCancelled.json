@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "ChangeSetCancelled"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Change Set Cancelled",
+        "x-amazon-events-source": "aws.marketplacecatalog",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/ChangeSetCancelled"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangeSetCancelled": {
+        "type": "object",
+        "required": [
+          "ChangeSetId",
+          "EndTime",
+          "requestId",
+          "StartTime",
+          "ChangeSetName",
+          "Catalog"
+        ],
+        "properties": {
+          "Catalog": {
+            "type": "string"
+          },
+          "ChangeSetId": {
+            "type": "string"
+          },
+          "ChangeSetName": {
+            "type": "string"
+          },
+          "EndTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "StartTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

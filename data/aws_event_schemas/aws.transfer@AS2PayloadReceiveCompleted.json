@@ -1,0 +1,145 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "AS2PayloadReceiveCompleted"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "AS2 Payload Receive Completed",
+        "x-amazon-events-source": "aws.transfer",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/AS2PayloadReceiveCompleted"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "AS2PayloadReceiveCompleted": {
+        "type": "object",
+        "required": [
+          "s3-attributes",
+          "client-ip",
+          "requester-file-name",
+          "end-timestamp",
+          "as2-from",
+          "as2-message-id",
+          "message-subject",
+          "start-timestamp",
+          "status-code",
+          "bytes",
+          "as2-to",
+          "agreement-id",
+          "server-id"
+        ],
+        "properties": {
+          "s3-attributes": {
+            "$ref": "#/components/schemas/S3-attributes"
+          },
+          "agreement-id": {
+            "type": "string"
+          },
+          "as2-from": {
+            "type": "string"
+          },
+          "as2-message-id": {
+            "type": "string"
+          },
+          "as2-to": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "number"
+          },
+          "client-ip": {
+            "type": "string"
+          },
+          "end-timestamp": {
+            "type": "string"
+          },
+          "message-subject": {
+            "type": "string"
+          },
+          "request-path": {
+            "type": "string"
+          },
+          "requester-file-name": {
+            "type": "string"
+          },
+          "server-id": {
+            "type": "string"
+          },
+          "start-timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status-code": {
+            "type": "string"
+          }
+        }
+      },
+      "S3-attributes": {
+        "type": "object",
+        "required": [
+          "file-key",
+          "file-bucket"
+        ],
+        "properties": {
+          "file-bucket": {
+            "type": "string"
+          },
+          "file-key": {
+            "type": "string"
+          },
+          "json-bucket": {
+            "type": "string"
+          },
+          "json-key": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

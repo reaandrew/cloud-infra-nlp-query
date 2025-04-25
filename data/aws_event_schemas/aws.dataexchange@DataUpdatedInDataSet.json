@@ -1,0 +1,243 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "DataUpdatedInDataSet"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Data Updated in Data Set",
+        "x-amazon-events-source": "aws.dataexchange",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/DataUpdatedInDataSet"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "DataUpdatedInDataSet": {
+        "type": "object",
+        "required": [
+          "DataSet",
+          "Product",
+          "Notification"
+        ],
+        "properties": {
+          "DataSet": {
+            "$ref": "#/components/schemas/DataSet"
+          },
+          "Notification": {
+            "$ref": "#/components/schemas/Notification"
+          },
+          "Product": {
+            "$ref": "#/components/schemas/Product"
+          }
+        }
+      },
+      "DataSet": {
+        "type": "object",
+        "required": [
+          "AssetType",
+          "Id",
+          "Name"
+        ],
+        "properties": {
+          "AssetType": {
+            "type": "string"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "required": [
+          "Type"
+        ],
+        "properties": {
+          "Details": {
+            "$ref": "#/components/schemas/Details"
+          },
+          "Scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "Comment": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "ProviderContact",
+          "Id",
+          "Name"
+        ],
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ProviderContact": {
+            "type": "string"
+          }
+        }
+      },
+      "Details": {
+        "type": "object",
+        "properties": {
+          "DataUpdate": {
+            "$ref": "#/components/schemas/DataUpdate"
+          }
+        }
+      },
+      "Scope": {
+        "type": "object",
+        "properties": {
+          "LakeFormationTagPolicies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LakeFormationTagPolicyDetails"
+            }
+          },
+          "RedshiftDataShares": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RedshiftDataShareDetails"
+            }
+          },
+          "S3DataAccesses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S3DataAccessDetails"
+            }
+          }
+        }
+      },
+      "DataUpdate": {
+        "type": "object",
+        "properties": {
+          "DataUpdatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LakeFormationTagPolicyDetails": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "Database": {
+            "type": "string",
+            "nullable": true
+          },
+          "Table": {
+            "type": "string"
+          }
+        }
+      },
+      "RedshiftDataShareDetails": {
+        "type": "object",
+        "nullable": true,
+        "required": [
+          "Database",
+          "Arn"
+        ],
+        "properties": {
+          "Arn": {
+            "type": "string",
+            "nullable": true
+          },
+          "Database": {
+            "type": "string",
+            "nullable": true
+          },
+          "Function": {
+            "type": "string",
+            "nullable": true
+          },
+          "Schema": {
+            "type": "string",
+            "nullable": true
+          },
+          "View": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "S3DataAccessDetails": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "KeyPrefixes": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "Keys": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

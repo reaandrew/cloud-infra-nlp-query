@@ -1,0 +1,95 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "SnapshotCreationFailed"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "Snapshot Creation Failed",
+        "x-amazon-events-source": "aws.elasticache",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/SnapshotCreationFailed"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "SnapshotCreationFailed": {
+        "type": "object",
+        "required": [
+          "Message",
+          "SourceArn",
+          "SourceType",
+          "SourceIdentifier",
+          "EventCategories",
+          "EventID"
+        ],
+        "properties": {
+          "EventCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "EventID": {
+            "type": "string"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "SourceArn": {
+            "type": "string"
+          },
+          "SourceIdentifier": {
+            "type": "string"
+          },
+          "SourceType": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
