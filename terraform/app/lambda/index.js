@@ -122,9 +122,12 @@ async function publishToEventBridge(transformedEvent) {
     };
 
     try {
+        // Log the event we're about to publish
+        console.log('Publishing event to EventBridge:', JSON.stringify(params, null, 2));
+
         const command = new PutEventsCommand(params);
         const result = await eventBridge.send(command);
-        console.log('Successfully published to EventBridge:', result);
+        console.log('Successfully published to EventBridge. Response:', JSON.stringify(result, null, 2));
         return result;
     } catch (error) {
         console.error('Error publishing to EventBridge:', error);
@@ -142,13 +145,18 @@ exports.handler = async (event) => {
         console.log('Transformed event for vectorization:', JSON.stringify(transformedEvent, null, 2));
 
         // 2. Publish transformed event to EventBridge
-        await publishToEventBridge(transformedEvent);
+        const publishResult = await publishToEventBridge(transformedEvent);
+
+        // Log the complete flow for debugging
+        console.log('Event processing complete. Event ID:', transformedEvent.metadata.eventId);
+        console.log('Publish result:', JSON.stringify(publishResult, null, 2));
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'Event processed and published successfully',
-                eventId: transformedEvent.metadata.eventId
+                eventId: transformedEvent.metadata.eventId,
+                publishResult: publishResult
             })
         };
     } catch (error) {
