@@ -1,5 +1,7 @@
-const AWS = require('aws-sdk');
-const eventBridge = new AWS.EventBridge();
+const { EventBridgeClient, PutEventsCommand } = require("@aws-sdk/client-eventbridge");
+
+// Create EventBridge client
+const eventBridge = new EventBridgeClient();
 
 /**
  * Extracts key metadata from an AWS event in a consistent format
@@ -13,34 +15,34 @@ function transformEventForVectorization(event) {
     const region = event.region || process.env.AWS_REGION;
     const account = event.account || 'unknown';
     const eventId = event.id || `generated-${Date.now()}`;
-    
+
     // Extract meaningful information from event details
     const detail = event.detail || {};
-    
+
     // Build a structured summary of the event
     const summary = [];
-    
+
     // Add event type description
     summary.push(`${eventType} event occurred in ${region}`);
-    
+
     // Add source description
     const sourceParts = source.split('.');
     const serviceName = sourceParts.length > 1 ? sourceParts[sourceParts.length - 1] : source;
     summary.push(`Service: ${serviceName}`);
-    
+
     // Extract meaningful fields from detail
     // We're being general here to handle any event type
     const extractedFields = {};
     const keyDetails = [];
-    
+
     // Process detail object
     Object.entries(detail).forEach(([key, value]) => {
         // Skip large nested objects or arrays for vectorization efficiency
         if (typeof value !== 'object' || value === null) {
             extractedFields[key] = value;
-            
+
             // Add human-readable details for important fields
-            if (key.includes('id') || 
+            if (key.includes('id') ||
                 key.includes('name') ||
                 key.includes('status') ||
                 key.includes('state') ||
@@ -61,8 +63,8 @@ function transformEventForVectorization(event) {
             Object.entries(value).forEach(([subKey, subValue]) => {
                 if (typeof subValue !== 'object' || subValue === null) {
                     extractedFields[key][subKey] = subValue;
-                    
-                    if (subKey.includes('id') || 
+
+                    if (subKey.includes('id') ||
                         subKey.includes('name') ||
                         subKey.includes('status') ||
                         subKey.includes('state') ||
@@ -73,12 +75,12 @@ function transformEventForVectorization(event) {
             });
         }
     });
-    
+
     // Add key details to summary
     if (keyDetails.length > 0) {
         summary.push(`Key details: ${keyDetails.join(', ')}`);
     }
-    
+
     // Create the final vectorization-friendly object
     return {
         // Metadata section
@@ -118,9 +120,10 @@ async function publishToEventBridge(transformedEvent) {
             }
         ]
     };
-    
+
     try {
-        const result = await eventBridge.putEvents(params).promise();
+        const command = new PutEventsCommand(params);
+        const result = await eventBridge.send(command);
         console.log('Successfully published to EventBridge:', result);
         return result;
     } catch (error) {
@@ -132,15 +135,15 @@ async function publishToEventBridge(transformedEvent) {
 exports.handler = async (event) => {
     try {
         console.log('Received event:', JSON.stringify(event, null, 2));
-        
+
         // 1. Transform the event into vectorization-friendly format
         const transformedEvent = transformEventForVectorization(event);
-        
+
         console.log('Transformed event for vectorization:', JSON.stringify(transformedEvent, null, 2));
-        
+
         // 2. Publish transformed event to EventBridge
         await publishToEventBridge(transformedEvent);
-        
+
         return {
             statusCode: 200,
             body: JSON.stringify({

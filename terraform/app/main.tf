@@ -65,13 +65,51 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
+# Create zip file for Lambda function
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  output_path = "${path.module}/lambda_function.zip"
+
+  source {
+    content  = file("${path.module}/lambda/index.js")
+    filename = "index.js"
+  }
+  
+  source {
+    content  = file("${path.module}/lambda/package.json")
+    filename = "package.json"
+  }
+}
+
+# Create a null_resource to install dependencies
+resource "null_resource" "lambda_dependencies" {
+  triggers = {
+    package_json_hash = filemd5("${path.module}/lambda/package.json")
+    lambda_code_hash  = filemd5("${path.module}/lambda/index.js")
+  }
+
+  provisioner "local-exec" {
+    command = "cd ${path.module}/lambda && npm install --production"
+  }
+}
+
+# Create zip file for Lambda function with dependencies
+data "archive_file" "lambda_zip_with_deps" {
+  depends_on = [null_resource.lambda_dependencies]
+  
+  type        = "zip"
+  output_path = "${path.module}/lambda_function_with_deps.zip"
+  source_dir  = "${path.module}/lambda"
+  excludes    = ["*.zip"]
+}
+
 # Create Lambda function
 resource "aws_lambda_function" "lambda_event_processor" {
-  filename         = data.archive_file.lambda_zip.output_path
+  filename         = data.archive_file.lambda_zip_with_deps.output_path
   function_name    = "${var.app_name}-event-processor"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = data.archive_file.lambda_zip_with_deps.output_base64sha256
   runtime         = "nodejs18.x"
 
   environment {
@@ -127,15 +165,4 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.lambda_event_processor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.demo_aws_events.arn
-}
-
-# Create zip file for Lambda function
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  output_path = "${path.module}/lambda_function.zip"
-
-  source {
-    content  = file("${path.module}/lambda/index.js")
-    filename = "index.js"
-  }
 } 
