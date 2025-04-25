@@ -142,7 +142,7 @@ resource "aws_cloudwatch_event_rule" "vectorization_events" {
   description = "Capture all vectorization-ready events"
 
   event_pattern = jsonencode({
-    source = ["app.event-processor"],
+    source = ["cloud-infra-nlp.event-processor"],
     "detail-type" = ["Vectorization Ready Event"]
   })
 

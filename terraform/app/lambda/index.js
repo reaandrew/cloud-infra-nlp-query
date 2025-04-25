@@ -3,6 +3,9 @@ const { EventBridgeClient, PutEventsCommand } = require("@aws-sdk/client-eventbr
 // Create EventBridge client
 const eventBridge = new EventBridgeClient();
 
+// App name prefix for events
+const APP_NAME_PREFIX = "cloud-infra-nlp";
+
 /**
  * Extracts key metadata from an AWS event in a consistent format
  * suitable for vectorization by an LLM embeddings service
@@ -30,49 +33,67 @@ function transformEventForVectorization(event) {
     const serviceName = sourceParts.length > 1 ? sourceParts[sourceParts.length - 1] : source;
     summary.push(`Service: ${serviceName}`);
 
-    // Extract meaningful fields from detail
-    // We're being general here to handle any event type
+    // Extract meaningful fields from detail - focus on important fields for vectorization
     const extractedFields = {};
     const keyDetails = [];
 
-    // Process detail object
+    // Process detail object - more selective about what we include
     Object.entries(detail).forEach(([key, value]) => {
         // Skip large nested objects or arrays for vectorization efficiency
         if (typeof value !== 'object' || value === null) {
-            extractedFields[key] = value;
-
-            // Add human-readable details for important fields
+            // Only include fields that are likely to be important for vectorization
             if (key.includes('id') ||
                 key.includes('name') ||
                 key.includes('status') ||
                 key.includes('state') ||
-                key.includes('type')) {
+                key.includes('type') ||
+                key.includes('key') ||
+                key.includes('bucket') ||
+                key.includes('arn')) {
+                extractedFields[key] = value;
                 keyDetails.push(`${key}: ${value}`);
             }
         } else if (Array.isArray(value)) {
-            // For arrays, we'll include length and a sample
-            extractedFields[key] = `Array with ${value.length} items`;
-            if (value.length > 0) {
-                // Get first item sample, but keep it short
-                const sample = JSON.stringify(value[0]).substring(0, 50);
-                keyDetails.push(`${key}: ${value.length} items, e.g., ${sample}${sample.length >= 50 ? '...' : ''}`);
+            // For arrays, only include if they're small and contain important information
+            if (value.length <= 3) {
+                extractedFields[key] = value.map(item => {
+                    if (typeof item === 'object') {
+                        // For objects in arrays, only include important fields
+                        const simplified = {};
+                        Object.entries(item).forEach(([k, v]) => {
+                            if (k.includes('id') || k.includes('name') || k.includes('type')) {
+                                simplified[k] = v;
+                            }
+                        });
+                        return simplified;
+                    }
+                    return item;
+                });
+            } else {
+                // For larger arrays, just include the count
+                extractedFields[key] = `Array with ${value.length} items`;
             }
         } else {
-            // For objects, process first level key-value pairs
-            extractedFields[key] = {};
+            // For objects, only process important fields
+            const importantFields = {};
             Object.entries(value).forEach(([subKey, subValue]) => {
-                if (typeof subValue !== 'object' || subValue === null) {
-                    extractedFields[key][subKey] = subValue;
-
-                    if (subKey.includes('id') ||
-                        subKey.includes('name') ||
-                        subKey.includes('status') ||
-                        subKey.includes('state') ||
-                        subKey.includes('type')) {
-                        keyDetails.push(`${key}.${subKey}: ${subValue}`);
-                    }
+                if (subKey.includes('id') ||
+                    subKey.includes('name') ||
+                    subKey.includes('status') ||
+                    subKey.includes('state') ||
+                    subKey.includes('type') ||
+                    subKey.includes('key') ||
+                    subKey.includes('bucket') ||
+                    subKey.includes('arn')) {
+                    importantFields[subKey] = subValue;
+                    keyDetails.push(`${key}.${subKey}: ${subValue}`);
                 }
             });
+
+            // Only include the object if it has important fields
+            if (Object.keys(importantFields).length > 0) {
+                extractedFields[key] = importantFields;
+            }
         }
     });
 
@@ -83,26 +104,20 @@ function transformEventForVectorization(event) {
 
     // Create the final vectorization-friendly object
     return {
-        // Metadata section
+        // Metadata section - streamlined
         metadata: {
             timestamp,
             source,
             eventType,
             region,
             account,
-            eventId
+            eventId,
+            appName: APP_NAME_PREFIX
         },
         // Extracted data section - simplified for LLM processing
         extractedData: extractedFields,
         // Human-readable summary for better context
-        summary: summary.join('. '),
-        // Original event reference
-        originalEvent: {
-            source: event.source,
-            detailType: event['detail-type'],
-            time: event.time,
-            id: event.id
-        }
+        summary: summary.join('. ')
     };
 }
 
@@ -113,7 +128,7 @@ async function publishToEventBridge(transformedEvent) {
     const params = {
         Entries: [
             {
-                Source: 'app.event-processor',
+                Source: `${APP_NAME_PREFIX}.event-processor`,
                 DetailType: 'Vectorization Ready Event',
                 Detail: JSON.stringify(transformedEvent),
                 EventBusName: 'default'
