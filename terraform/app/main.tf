@@ -53,6 +53,13 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:${var.aws_region}:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "events:PutEvents"
+        ]
+        Resource = "arn:aws:events:${var.aws_region}:*:event-bus/default"
       }
     ]
   })
@@ -86,6 +93,21 @@ resource "aws_cloudwatch_event_rule" "demo_aws_events" {
   })
 
   # Prevent destroy until target is removed
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Create EventBridge rule for vectorization-ready events
+resource "aws_cloudwatch_event_rule" "vectorization_events" {
+  name        = "${var.app_name}-vectorization-events"
+  description = "Capture all vectorization-ready events"
+
+  event_pattern = jsonencode({
+    source = ["app.event-processor"],
+    "detail-type" = ["Vectorization Ready Event"]
+  })
+
   lifecycle {
     create_before_destroy = true
   }
