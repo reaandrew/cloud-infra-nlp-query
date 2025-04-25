@@ -59,9 +59,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
 }
 
 # Create Lambda function
-resource "aws_lambda_function" "ec2_event_logger" {
+resource "aws_lambda_function" "lambda_event_processor" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "${var.app_name}-ec2-event-logger"
+  function_name    = "${var.app_name}-event-processor"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
@@ -74,31 +74,37 @@ resource "aws_lambda_function" "ec2_event_logger" {
   }
 }
 
-# Create EventBridge rule for EC2 events
-resource "aws_cloudwatch_event_rule" "ec2_events" {
-  name        = "${var.app_name}-ec2-events"
-  description = "Capture EC2 events"
+# Create EventBridge rule for AWS events
+resource "aws_cloudwatch_event_rule" "demo_aws_events" {
+  name        = "${var.app_name}-events" # Keep a consistent name to avoid recreation
+  description = "Capture all demo AWS events"
 
   event_pattern = jsonencode({
-    source      = ["demo.aws.ec2"],
-    detail-type = ["EC2 Instance State-change Notification"]
+    source = [
+      {"prefix": "demo.aws"}
+    ]
   })
+
+  # Prevent destroy until target is removed
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Create EventBridge target
 resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.ec2_events.name
+  rule      = aws_cloudwatch_event_rule.demo_aws_events.name
   target_id = "SendToLambda"
-  arn       = aws_lambda_function.ec2_event_logger.arn
+  arn       = aws_lambda_function.lambda_event_processor.arn
 }
 
 # Create Lambda permission for EventBridge
 resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
+  statement_id  = "AllowEventBridge-${aws_cloudwatch_event_rule.demo_aws_events.name}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ec2_event_logger.function_name
+  function_name = aws_lambda_function.lambda_event_processor.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.ec2_events.arn
+  source_arn    = aws_cloudwatch_event_rule.demo_aws_events.arn
 }
 
 # Create zip file for Lambda function
