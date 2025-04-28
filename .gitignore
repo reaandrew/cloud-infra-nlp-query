@@ -1,6 +1,9 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Node.js dependencies
+node_modules/
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
