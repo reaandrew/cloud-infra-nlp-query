@@ -55,6 +55,18 @@ resource "aws_s3_bucket_versioning" "config_spec_chunks" {
   }
 }
 
+# S3 bucket for storing config vector embeddings
+resource "aws_s3_bucket" "config_vectors" {
+  bucket = "cinq-config-vectors"
+}
+
+resource "aws_s3_bucket_versioning" "config_vectors" {
+  bucket = aws_s3_bucket.config_vectors.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 # S3 event notification for chunks bucket
 resource "aws_s3_bucket_notification" "config_chunks_events" {
   bucket = aws_s3_bucket.config_spec_chunks.id
@@ -323,6 +335,12 @@ resource "aws_iam_role" "fetch_vectors_role" {
   })
 }
 
+# Attach the AWS managed Bedrock policy to the role
+resource "aws_iam_role_policy_attachment" "bedrock_policy_attachment" {
+  role       = aws_iam_role.fetch_vectors_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonBedrockFullAccess"
+}
+
 # IAM policy for fetch_vectors Lambda
 resource "aws_iam_role_policy" "fetch_vectors_policy" {
   name = "fetch-vectors-lambda-policy"
@@ -349,6 +367,23 @@ resource "aws_iam_role_policy" "fetch_vectors_policy" {
           aws_s3_bucket.config_spec_chunks.arn,
           "${aws_s3_bucket.config_spec_chunks.arn}/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = [
+          aws_s3_bucket.config_vectors.arn,
+          "${aws_s3_bucket.config_vectors.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel"
+        ]
+        Resource = "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v2:0"
       }
     ]
   })
@@ -368,6 +403,8 @@ resource "aws_lambda_function" "fetch_vectors" {
   environment {
     variables = {
       REGION = var.aws_region
+      VECTORS_BUCKET = aws_s3_bucket.config_vectors.id
+      TITAN_MODEL_ID = "amazon.titan-embed-text-v2:0"
     }
   }
 }

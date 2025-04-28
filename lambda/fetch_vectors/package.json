@@ -1,10 +1,11 @@
 {
   "name": "fetch-vectors",
   "version": "1.0.0",
-  "description": "Lambda function that subscribes to S3 events from the chunks bucket",
+  "description": "Lambda function for generating and storing embeddings from S3 chunks",
   "main": "index.js",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.456.0"
+    "@aws-sdk/client-s3": "^3.456.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.456.0"
   },
   "author": "",
   "license": "ISC"

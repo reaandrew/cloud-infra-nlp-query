@@ -101,6 +101,14 @@ resource "aws_iam_role_policy" "ci_policy" {
           "arn:aws:events:${var.aws_region}:889772146711:rule/${var.app_name}-*",
           "arn:aws:logs:${var.aws_region}:889772146711:log-group:/aws/lambda/${var.app_name}-*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:GetFoundationModel"
+        ]
+        Resource = "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v2:0"
       }
     ]
   })
