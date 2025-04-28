@@ -19,9 +19,21 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Create IAM role for Lambda
+# S3 bucket for storing AWS Config documentation and examples
+resource "aws_s3_bucket" "config_docs" {
+  bucket = var.config_docs_bucket_name
+}
+
+resource "aws_s3_bucket_versioning" "config_docs" {
+  bucket = aws_s3_bucket.config_docs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# IAM role for the Lambda functions
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.app_name}-lambda-role"
+  name = "config-query-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -37,14 +49,22 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-# Create IAM policy for Lambda
+# IAM policy for the Lambda functions
 resource "aws_iam_role_policy" "lambda_policy" {
-  name = "${var.app_name}-lambda-policy"
+  name = "config-query-lambda-policy"
   role = aws_iam_role.lambda_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "config:SelectAggregateResourceConfig",
+          "config:SelectResourceConfig"
+        ]
+        Resource = "*"
+      },
       {
         Effect = "Allow"
         Action = [
@@ -57,112 +77,91 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "events:PutEvents"
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket"
         ]
-        Resource = "arn:aws:events:${var.aws_region}:*:event-bus/default"
+        Resource = [
+          aws_s3_bucket.config_docs.arn,
+          "${aws_s3_bucket.config_docs.arn}/*"
+        ]
       }
     ]
   })
 }
 
-# Create zip file for Lambda function
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  output_path = "${path.module}/lambda_function.zip"
-
-  source {
-    content  = file("${path.module}/lambda/index.js")
-    filename = "index.js"
-  }
-  
-  source {
-    content  = file("${path.module}/lambda/package.json")
-    filename = "package.json"
-  }
-}
-
-# Create a null_resource to install dependencies
-resource "null_resource" "lambda_dependencies" {
-  triggers = {
-    package_json_hash = filemd5("${path.module}/lambda/package.json")
-    lambda_code_hash  = filemd5("${path.module}/lambda/index.js")
-  }
-
-  provisioner "local-exec" {
-    command = "cd ${path.module}/lambda && npm install --production"
-  }
-}
-
-# Create zip file for Lambda function with dependencies
-data "archive_file" "lambda_zip_with_deps" {
-  depends_on = [null_resource.lambda_dependencies]
-  
-  type        = "zip"
-  output_path = "${path.module}/lambda_function_with_deps.zip"
-  source_dir  = "${path.module}/lambda"
-  excludes    = ["*.zip"]
-}
-
-# Create Lambda function
-resource "aws_lambda_function" "lambda_event_processor" {
-  filename         = data.archive_file.lambda_zip_with_deps.output_path
-  function_name    = "${var.app_name}-event-processor"
+# Lambda function for executing Config queries
+resource "aws_lambda_function" "config_query" {
+  filename         = "lambda/config_query.zip"
+  function_name    = "cloud-infra-nlp-query-config-query"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  source_code_hash = data.archive_file.lambda_zip_with_deps.output_base64sha256
   runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
   environment {
     variables = {
-      LOG_LEVEL = "INFO"
+      CONFIG_DOCS_BUCKET = aws_s3_bucket.config_docs.id
     }
   }
 }
 
-# Create EventBridge rule for AWS events
-resource "aws_cloudwatch_event_rule" "demo_aws_events" {
-  name        = "${var.app_name}-events" # Keep a consistent name to avoid recreation
-  description = "Capture all demo AWS events"
+# Lambda function for refreshing documentation
+resource "aws_lambda_function" "refresh_docs_data" {
+  filename         = "lambda/refresh_docs_data.zip"
+  function_name    = "cloud-infra-nlp-query-refresh-docs"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "lambda_function.lambda_handler"
+  runtime         = "python3.12"
+  timeout         = 60
+  memory_size     = 256
 
-  event_pattern = jsonencode({
-    source = [
-      {"prefix": "demo.aws"}
-    ]
-  })
-
-  # Prevent destroy until target is removed
-  lifecycle {
-    create_before_destroy = true
+  environment {
+    variables = {
+      DEST_BUCKET = aws_s3_bucket.config_docs.id
+      DEST_KEY_PREFIX = "config-specs/"
+      REGION = var.aws_region
+    }
   }
 }
 
-# Create EventBridge rule for vectorization-ready events
-resource "aws_cloudwatch_event_rule" "vectorization_events" {
-  name        = "${var.app_name}-vectorization-events"
-  description = "Capture all vectorization-ready events"
-
-  event_pattern = jsonencode({
-    source = ["cloud-infra-nlp.event-processor"],
-    "detail-type" = ["Vectorization Ready Event"]
-  })
-
-  lifecycle {
-    create_before_destroy = true
-  }
+# API Gateway REST API
+resource "aws_apigatewayv2_api" "config_query" {
+  name          = "config-query-api"
+  protocol_type = "HTTP"
 }
 
-# Create EventBridge target
-resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.demo_aws_events.name
-  target_id = "SendToLambda"
-  arn       = aws_lambda_function.lambda_event_processor.arn
+# API Gateway integration with Lambda
+resource "aws_apigatewayv2_integration" "config_query" {
+  api_id           = aws_apigatewayv2_api.config_query.id
+  integration_type = "AWS_PROXY"
+
+  connection_type      = "INTERNET"
+  description         = "Lambda integration"
+  integration_method  = "POST"
+  integration_uri     = aws_lambda_function.config_query.invoke_arn
 }
 
-# Create Lambda permission for EventBridge
-resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowEventBridge-${aws_cloudwatch_event_rule.demo_aws_events.name}"
+# API Gateway route
+resource "aws_apigatewayv2_route" "config_query" {
+  api_id    = aws_apigatewayv2_api.config_query.id
+  route_key = "POST /query"
+  target    = "integrations/${aws_apigatewayv2_integration.config_query.id}"
+}
+
+# API Gateway stage
+resource "aws_apigatewayv2_stage" "config_query" {
+  api_id = aws_apigatewayv2_api.config_query.id
+  name   = "prod"
+  auto_deploy = true
+}
+
+# Lambda permission for API Gateway
+resource "aws_lambda_permission" "config_query" {
+  statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_event_processor.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.demo_aws_events.arn
+  function_name = aws_lambda_function.config_query.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.config_query.execution_arn}/*/*"
 } 
