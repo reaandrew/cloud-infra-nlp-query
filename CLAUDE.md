@@ -23,12 +23,17 @@ aws-vault exec ee-sandbox -- <command>
 ```
 
 ### Deploy Infrastructure
-Deploy the entire stack:
+Deploy the entire stack (run this from the project root):
 ```bash
 aws-vault exec ee-sandbox -- make deploy
 ```
 
-Package Lambda functions individually:
+This command will automatically:
+1. Package all Lambda functions 
+2. Apply Terraform changes
+3. Deploy all resources to AWS
+
+Package Lambda functions individually (only needed for manual testing):
 ```bash
 ./scripts/package_lambda.sh
 ```

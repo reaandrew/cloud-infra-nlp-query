@@ -8,6 +8,7 @@ mkdir -p terraform/app/lambda
 # Package config_query Lambda (Node.js)
 echo "Packaging config_query Lambda..."
 cd lambda/config_query
+npm install
 zip -r ../../terraform/app/lambda/config_query.zip .
 cd ../..
 
@@ -27,6 +28,13 @@ cd ../..
 echo "Packaging fetch_vectors Lambda..."
 cd lambda/fetch_vectors
 zip -r ../../terraform/app/lambda/fetch_vectors.zip .
+cd ../..
+
+# Package load_vectors_to_opensearch Lambda (Node.js)
+echo "Packaging load_vectors_to_opensearch Lambda..."
+cd lambda/load_vectors_to_opensearch
+npm install
+zip -r ../../terraform/app/lambda/load_vectors_to_opensearch.zip .
 cd ../..
 
 echo "Lambda packaging complete!" 

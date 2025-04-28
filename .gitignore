@@ -37,4 +37,4 @@ terraform.rc
 .idea/
 .vscode/
 *.swp
-*.swo 
+*.swo .terraform.lock.hcl
