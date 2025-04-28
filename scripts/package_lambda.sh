@@ -17,4 +17,16 @@ cd lambda/refresh_docs_data
 zip -r ../../terraform/app/lambda/refresh_docs_data.zip .
 cd ../..
 
+# Package chunk_config_spec Lambda (Node.js)
+echo "Packaging chunk_config_spec Lambda..."
+cd lambda/chunk_config_spec
+zip -r ../../terraform/app/lambda/chunk_config_spec.zip .
+cd ../..
+
+# Package fetch_vectors Lambda (Node.js)
+echo "Packaging fetch_vectors Lambda..."
+cd lambda/fetch_vectors
+zip -r ../../terraform/app/lambda/fetch_vectors.zip .
+cd ../..
+
 echo "Lambda packaging complete!" 
