@@ -37,4 +37,11 @@ npm install
 zip -r ../../terraform/app/lambda/load_vectors_to_opensearch.zip .
 cd ../..
 
+# Package config_nlq_processor Lambda (Node.js)
+echo "Packaging config_nlq_processor Lambda..."
+cd lambda/config_nlq_processor
+npm install
+zip -r ../../terraform/app/lambda/config_nlq_processor.zip .
+cd ../..
+
 echo "Lambda packaging complete!" 

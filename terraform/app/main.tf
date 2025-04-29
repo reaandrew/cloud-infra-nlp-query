@@ -101,7 +101,7 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-# Attach the AWS managed Bedrock policy to the config_query role
+# Attach the AWS managed Bedrock policy to the lambda roles
 resource "aws_iam_role_policy_attachment" "bedrock_policy_attachment_config_query" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonBedrockFullAccess"
@@ -164,7 +164,10 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "bedrock:InvokeModel"
         ]
-        Resource = "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v2:0"
+        Resource = [
+          "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v2:0",
+          "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
+        ]
       },
       {
         Effect = "Allow"
@@ -256,6 +259,57 @@ resource "aws_lambda_permission" "config_query" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.config_query.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.config_query.execution_arn}/*/*"
+}
+
+# Lambda function for NLQ processing with Claude
+resource "aws_lambda_function" "config_nlq_processor" {
+  filename         = "lambda/config_nlq_processor.zip"
+  function_name    = "cloud-infra-nlq-query-processor"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "index.handler"
+  runtime          = "nodejs18.x"
+  timeout          = 60   # Increased timeout for Claude processing
+  memory_size      = 512  # Increased memory for vector operations and Claude
+  source_code_hash = filebase64sha256("lambda/config_nlq_processor.zip")
+
+  environment {
+    variables = {
+      REGION = var.aws_region
+      OPENSEARCH_DOMAIN = aws_opensearch_domain.config_vectors.endpoint
+      OPENSEARCH_INDEX = "config-vectors"
+      TITAN_MODEL_ID = "amazon.titan-embed-text-v2:0"
+      CLAUDE_MODEL_ID = "anthropic.claude-3-sonnet-20240229-v1:0"
+      OPENSEARCH_CREDS_SECRET = aws_secretsmanager_secret.opensearch_credentials.name
+      RESULTS_LIMIT = "5"
+    }
+  }
+}
+
+# API Gateway route for NLQ processor
+resource "aws_apigatewayv2_route" "config_nlq_processor" {
+  api_id    = aws_apigatewayv2_api.config_query.id
+  route_key = "POST /nlq"
+  target    = "integrations/${aws_apigatewayv2_integration.config_nlq_processor.id}"
+}
+
+# API Gateway integration with NLQ processor Lambda
+resource "aws_apigatewayv2_integration" "config_nlq_processor" {
+  api_id           = aws_apigatewayv2_api.config_query.id
+  integration_type = "AWS_PROXY"
+
+  connection_type      = "INTERNET"
+  description         = "Lambda integration for NLQ processor"
+  integration_method  = "POST"
+  integration_uri     = aws_lambda_function.config_nlq_processor.invoke_arn
+}
+
+# Lambda permission for API Gateway to invoke NLQ processor
+resource "aws_lambda_permission" "config_nlq_processor" {
+  statement_id  = "AllowAPIGatewayInvokeNLQ"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.config_nlq_processor.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.config_query.execution_arn}/*/*"
 }
