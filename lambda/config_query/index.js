@@ -64,7 +64,7 @@ async function searchVectors(vector, k = 5) {
         size: k,
         query: {
           knn: {
-            vector: {
+            embedding: {
               vector: vector,
               k: k
             }

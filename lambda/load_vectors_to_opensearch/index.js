@@ -109,8 +109,7 @@ async function loadVectorToOpenSearch(bucket, key) {
       
       // Construct document to index
       const document = {
-        vector: data.embedding,  // Using vector to match the OpenSearch knn_vector field
-        embedding: data.embedding,  // Keep the original embedding too
+        embedding: data.embedding,  // Must match the field name in the OpenSearch mapping
         text: data.original ? JSON.stringify(data.original) : '',
         source: key,
         resourceType: data.original && data.original.resourceType ? data.original.resourceType : 'unknown',
